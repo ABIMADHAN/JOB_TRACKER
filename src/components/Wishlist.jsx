@@ -6,24 +6,21 @@ import Card from "react-bootstrap/Card";
 import { MdDeleteSweep } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { jobdelete } from "../store/Createslice"; 
+import { jobdelete } from "../store/Createslice";
 const Wishlist = () => {
-  
   let [data, setdata] = useState([]);
-
 
   const dispatch = useDispatch();
   const wishlistJobs = useSelector((state) => state.jobs);
   console.log("Wishlist jobs from Redux:", wishlistJobs);
 
   const navigate = useNavigate();
-  
+
   const handleRemove = (id) => {
     dispatch(jobdelete(id));
     console.log("Removed job with ID:", id);
   };
 
-  
   const jobsToDisplay =
     wishlistJobs && wishlistJobs.length > 0 ? wishlistJobs : data;
 
@@ -61,10 +58,10 @@ const Wishlist = () => {
                     item.status === "applied"
                       ? "#0d6efd"
                       : item.status === "interview"
-                      ? "#198754"
-                      : item.status === "rejected"
-                      ? "#dc3545"
-                      : "#6c757d",
+                        ? "#198754"
+                        : item.status === "rejected"
+                          ? "#dc3545"
+                          : "#6c757d",
                 }}
               />
 
@@ -83,19 +80,24 @@ const Wishlist = () => {
                   <strong>Type:</strong> {item.jobType || "Not specified"}
                   <br />
                   <strong>Status:</strong> {item.status || "Not specified"}
+                  <br />
+                  <strong>Applied Date:</strong>{" "}
+                  {item.appliedDate || "Not specified"}
+                  <br />
+                  <strong>Deadline:</strong> {item.deadline || "Not specified"}
                 </Card.Text>
 
                 <hr />
 
                 <div>
-                  <label>Apply Before: </label>
-                  <span>
-                    {item.appliedDate
-                      ? item.appliedDate.length > 100
-                        ? item.appliedDate.substring(0, 100) + "..."
-                        : item.appliedDate
-                      : "No description available"}
-                  </span>
+                  <strong>Notes:</strong>
+                  <p>
+                    {item.notes
+                      ? item.notes.length > 100
+                        ? item.notes.substring(0, 100) + "..."
+                        : item.notes
+                      : "No notes available"}
+                  </p>
                 </div>
 
                 <Button
