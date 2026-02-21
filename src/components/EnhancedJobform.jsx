@@ -49,13 +49,14 @@ const EnhancedJobform = () => {
   const fetchJobs = async () => {
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:3000/jobs");
+      const response = await fetch("/data.json");
 
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
 
-      const data = await response.json();
+      const result = await response.json();
+      const data = result.jobs || [];
       const validData = data.filter((item) => item && item.id);
 
       setJobs(validData);
@@ -93,17 +94,14 @@ const EnhancedJobform = () => {
 
     if (result.isConfirmed) {
       try {
-        const response = await fetch(`http://localhost:3000/jobs/${id}`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        // Note: DELETE operation not supported with static JSON hosting
+        // This is a client-side simulation only
+        const response = { ok: true }; // Simulated response
 
         if (response.ok) {
           setJobs((prevData) => prevData.filter((item) => item.id !== id));
           setFilteredJobs((prevData) =>
-            prevData.filter((item) => item.id !== id)
+            prevData.filter((item) => item.id !== id),
           );
           dispatch(jobdelete(id));
 
@@ -299,8 +297,8 @@ const EnhancedJobform = () => {
                                   daysUntilDeadline < 7
                                     ? "danger"
                                     : daysUntilDeadline < 14
-                                    ? "warning"
-                                    : "success"
+                                      ? "warning"
+                                      : "success"
                                 }
                                 className="ms-2"
                               >

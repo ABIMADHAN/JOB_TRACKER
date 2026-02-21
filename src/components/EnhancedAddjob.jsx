@@ -1,6 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { Container, Card, Form, Button, Row, Col, Alert, Spinner } from "react-bootstrap";
-import { FaBriefcase, FaSave, FaArrowLeft, FaBuilding, FaMapMarkerAlt } from "react-icons/fa";
+import {
+  Container,
+  Card,
+  Form,
+  Button,
+  Row,
+  Col,
+  Alert,
+  Spinner,
+} from "react-bootstrap";
+import {
+  FaBriefcase,
+  FaSave,
+  FaArrowLeft,
+  FaBuilding,
+  FaMapMarkerAlt,
+} from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router-dom";
 import Swal from "sweetalert2";
 import "./EnhancedAddjob.css";
@@ -9,18 +24,18 @@ const EnhancedAddjob = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const editId = searchParams.get('edit');
-  
+  const editId = searchParams.get("edit");
+
   const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [errors, setErrors] = useState({});
-  
+
   const [jobData, setJobData] = useState({
     id: "",
     company: "",
     position: "",
     status: "applied",
-    appliedDate: new Date().toISOString().split('T')[0],
+    appliedDate: new Date().toISOString().split("T")[0],
     deadline: "",
     location: "",
     jobType: "Full-time",
@@ -28,7 +43,7 @@ const EnhancedAddjob = () => {
     priority: "medium",
     source: "Company Website",
     contactEmail: "",
-    notes: ""
+    notes: "",
   });
 
   useEffect(() => {
@@ -41,9 +56,10 @@ const EnhancedAddjob = () => {
   const fetchJobForEdit = async (id) => {
     try {
       setIsLoading(true);
-      const response = await fetch(`http://localhost:3000/jobs/${id}`);
+      const response = await fetch("/data.json");
       if (response.ok) {
-        const job = await response.json();
+        const result = await response.json();
+        const job = result.jobs.find((j) => j.id === id);
         setJobData(job);
       } else {
         throw new Error("Job not found");
@@ -55,7 +71,7 @@ const EnhancedAddjob = () => {
         text: "Failed to load job data for editing.",
         icon: "error",
       });
-      navigate('/Jobform');
+      navigate("/Jobform");
     } finally {
       setIsLoading(false);
     }
@@ -80,7 +96,10 @@ const EnhancedAddjob = () => {
       newErrors.appliedDate = "Application date is required";
     }
 
-    if (jobData.deadline && new Date(jobData.deadline) < new Date(jobData.appliedDate)) {
+    if (
+      jobData.deadline &&
+      new Date(jobData.deadline) < new Date(jobData.appliedDate)
+    ) {
       newErrors.deadline = "Deadline cannot be before application date";
     }
 
@@ -94,23 +113,23 @@ const EnhancedAddjob = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setJobData(prev => ({
+    setJobData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
 
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: ""
+        [name]: "",
       }));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -118,41 +137,32 @@ const EnhancedAddjob = () => {
     setIsLoading(true);
 
     try {
-      const url = isEditing 
-        ? `http://localhost:3000/jobs/${jobData.id}`
-        : "http://localhost:3000/jobs";
-      
-      const method = isEditing ? "PUT" : "POST";
-      
-      const dataToSubmit = isEditing 
-        ? jobData 
+      // Note: POST/PUT operations not supported with static JSON hosting
+      // This is a client-side simulation only
+      const dataToSubmit = isEditing
+        ? jobData
         : { ...jobData, id: Date.now().toString() };
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(dataToSubmit),
-      });
+      // Simulated response for static hosting
+      const response = { ok: true };
 
       if (response.ok) {
         await Swal.fire({
           title: "Success!",
-          text: `Job ${isEditing ? 'updated' : 'added'} successfully!`,
+          text: `Job ${isEditing ? "updated" : "added"} successfully!`,
           icon: "success",
           confirmButtonText: "OK",
         });
-        
-        navigate('/Jobform');
+
+        navigate("/Jobform");
       } else {
-        throw new Error(`Failed to ${isEditing ? 'update' : 'add'} job`);
+        throw new Error(`Failed to ${isEditing ? "update" : "add"} job`);
       }
     } catch (error) {
       console.error("Error saving job:", error);
       Swal.fire({
         title: "Error!",
-        text: `Failed to ${isEditing ? 'update' : 'add'} job. Please try again.`,
+        text: `Failed to ${isEditing ? "update" : "add"} job. Please try again.`,
         icon: "error",
         confirmButtonText: "OK",
       });
@@ -167,7 +177,7 @@ const EnhancedAddjob = () => {
       company: "",
       position: "",
       status: "applied",
-      appliedDate: new Date().toISOString().split('T')[0],
+      appliedDate: new Date().toISOString().split("T")[0],
       deadline: "",
       location: "",
       jobType: "Full-time",
@@ -175,14 +185,17 @@ const EnhancedAddjob = () => {
       priority: "medium",
       source: "Company Website",
       contactEmail: "",
-      notes: ""
+      notes: "",
     });
     setErrors({});
   };
 
   if (isLoading && isEditing) {
     return (
-      <Container className="d-flex justify-content-center align-items-center" style={{ minHeight: "400px" }}>
+      <Container
+        className="d-flex justify-content-center align-items-center"
+        style={{ minHeight: "400px" }}
+      >
         <Spinner animation="border" variant="primary" />
         <span className="ms-2">Loading job data...</span>
       </Container>
@@ -192,21 +205,23 @@ const EnhancedAddjob = () => {
   return (
     <Container className="enhanced-addjob-container">
       <div className="page-header">
-        <Button 
-          variant="outline-secondary" 
+        <Button
+          variant="outline-secondary"
           className="back-btn mb-3"
-          onClick={() => navigate('/Jobform')}
+          onClick={() => navigate("/Jobform")}
         >
           <FaArrowLeft className="me-2" />
           Back to Jobs
         </Button>
-        
+
         <h1 className="page-title">
           <FaBriefcase className="me-3" />
-          {isEditing ? 'Edit Job Application' : 'Add New Job Application'}
+          {isEditing ? "Edit Job Application" : "Add New Job Application"}
         </h1>
         <p className="page-subtitle">
-          {isEditing ? 'Update your job application details' : 'Track your job application journey'}
+          {isEditing
+            ? "Update your job application details"
+            : "Track your job application journey"}
         </p>
       </div>
 
@@ -217,7 +232,7 @@ const EnhancedAddjob = () => {
             Job Details
           </h5>
         </Card.Header>
-        
+
         <Card.Body>
           <Form onSubmit={handleSubmit}>
             <Row className="g-4">
@@ -234,7 +249,7 @@ const EnhancedAddjob = () => {
                     value={jobData.company}
                     onChange={handleInputChange}
                     placeholder="Enter company name"
-                    className={`form-input ${errors.company ? 'is-invalid' : ''}`}
+                    className={`form-input ${errors.company ? "is-invalid" : ""}`}
                   />
                   {errors.company && (
                     <div className="invalid-feedback">{errors.company}</div>
@@ -254,7 +269,7 @@ const EnhancedAddjob = () => {
                     value={jobData.position}
                     onChange={handleInputChange}
                     placeholder="Enter job position"
-                    className={`form-input ${errors.position ? 'is-invalid' : ''}`}
+                    className={`form-input ${errors.position ? "is-invalid" : ""}`}
                   />
                   {errors.position && (
                     <div className="invalid-feedback">{errors.position}</div>
@@ -275,7 +290,7 @@ const EnhancedAddjob = () => {
                     value={jobData.location}
                     onChange={handleInputChange}
                     placeholder="Enter job location"
-                    className={`form-input ${errors.location ? 'is-invalid' : ''}`}
+                    className={`form-input ${errors.location ? "is-invalid" : ""}`}
                   />
                   {errors.location && (
                     <div className="invalid-feedback">{errors.location}</div>
@@ -304,7 +319,9 @@ const EnhancedAddjob = () => {
               {/* Status and Priority */}
               <Col md={4}>
                 <Form.Group>
-                  <Form.Label className="form-label">Application Status</Form.Label>
+                  <Form.Label className="form-label">
+                    Application Status
+                  </Form.Label>
                   <Form.Select
                     name="status"
                     value={jobData.status}
@@ -349,7 +366,9 @@ const EnhancedAddjob = () => {
                     <option value="Indeed">Indeed</option>
                     <option value="Glassdoor">Glassdoor</option>
                     <option value="AngelList">AngelList</option>
-                    <option value="Stack Overflow Jobs">Stack Overflow Jobs</option>
+                    <option value="Stack Overflow Jobs">
+                      Stack Overflow Jobs
+                    </option>
                     <option value="Referral">Referral</option>
                     <option value="University Portal">University Portal</option>
                     <option value="Other">Other</option>
@@ -360,13 +379,15 @@ const EnhancedAddjob = () => {
               {/* Dates */}
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label className="form-label">Application Date *</Form.Label>
+                  <Form.Label className="form-label">
+                    Application Date *
+                  </Form.Label>
                   <Form.Control
                     type="date"
                     name="appliedDate"
                     value={jobData.appliedDate}
                     onChange={handleInputChange}
-                    className={`form-input ${errors.appliedDate ? 'is-invalid' : ''}`}
+                    className={`form-input ${errors.appliedDate ? "is-invalid" : ""}`}
                   />
                   {errors.appliedDate && (
                     <div className="invalid-feedback">{errors.appliedDate}</div>
@@ -376,13 +397,15 @@ const EnhancedAddjob = () => {
 
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label className="form-label">Application Deadline</Form.Label>
+                  <Form.Label className="form-label">
+                    Application Deadline
+                  </Form.Label>
                   <Form.Control
                     type="date"
                     name="deadline"
                     value={jobData.deadline}
                     onChange={handleInputChange}
-                    className={`form-input ${errors.deadline ? 'is-invalid' : ''}`}
+                    className={`form-input ${errors.deadline ? "is-invalid" : ""}`}
                   />
                   {errors.deadline && (
                     <div className="invalid-feedback">{errors.deadline}</div>
@@ -414,10 +437,12 @@ const EnhancedAddjob = () => {
                     value={jobData.contactEmail}
                     onChange={handleInputChange}
                     placeholder="hr@company.com"
-                    className={`form-input ${errors.contactEmail ? 'is-invalid' : ''}`}
+                    className={`form-input ${errors.contactEmail ? "is-invalid" : ""}`}
                   />
                   {errors.contactEmail && (
-                    <div className="invalid-feedback">{errors.contactEmail}</div>
+                    <div className="invalid-feedback">
+                      {errors.contactEmail}
+                    </div>
                   )}
                 </Form.Group>
               </Col>
@@ -451,7 +476,7 @@ const EnhancedAddjob = () => {
               >
                 Reset Form
               </Button>
-              
+
               <Button
                 type="submit"
                 variant="primary"
@@ -467,12 +492,12 @@ const EnhancedAddjob = () => {
                       role="status"
                       className="me-2"
                     />
-                    {isEditing ? 'Updating...' : 'Saving...'}
+                    {isEditing ? "Updating..." : "Saving..."}
                   </>
                 ) : (
                   <>
                     <FaSave className="me-2" />
-                    {isEditing ? 'Update Job' : 'Save Job'}
+                    {isEditing ? "Update Job" : "Save Job"}
                   </>
                 )}
               </Button>

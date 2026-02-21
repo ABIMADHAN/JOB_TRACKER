@@ -16,7 +16,7 @@ const Jobform = () => {
 
   useEffect(() => {
     // Fetch jobs data
-    fetch("http://localhost:3000/jobs", { method: "GET" })
+    fetch("/data.json", { method: "GET" })
       .then((res) => {
         console.log(res);
         if (!res.ok) {
@@ -24,8 +24,9 @@ const Jobform = () => {
         }
         return res.json();
       })
-      .then((received) => {
-        console.log("Received data:", received);
+      .then((result) => {
+        console.log("Received data:", result);
+        const received = result.jobs || [];
 
         const validData = received.filter((item) => item && item.id);
 
@@ -45,12 +46,11 @@ const Jobform = () => {
 
     console.log(`Attempting to delete job with ID: ${id}`);
 
-    fetch(`http://localhost:3000/jobs/${id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
+    // Note: DELETE operation not supported with static JSON hosting
+    // This is a client-side simulation only
+    const response = { ok: true, status: 200 }; // Simulated response
+
+    Promise.resolve(response)
       .then((response) => {
         console.log(`Delete response status: ${response.status}`);
         if (response.ok) {
@@ -63,7 +63,7 @@ const Jobform = () => {
           console.log("Successfully deleted job with ID:", id);
         } else {
           throw new Error(
-            `Failed to delete item with ID: ${id}, status: ${response.status}`
+            `Failed to delete item with ID: ${id}, status: ${response.status}`,
           );
         }
       })
@@ -79,7 +79,6 @@ const Jobform = () => {
 
     console.log("Added job to wishlist:", item);
     // Navigate to the wishlist page to see the added job
-   
   };
 
   return (
@@ -116,10 +115,10 @@ const Jobform = () => {
                     item.status === "applied"
                       ? "#0d6efd"
                       : item.status === "interview"
-                      ? "#198754"
-                      : item.status === "rejected"
-                      ? "#dc3545"
-                      : "#6c757d",
+                        ? "#198754"
+                        : item.status === "rejected"
+                          ? "#dc3545"
+                          : "#6c757d",
                 }}
               />
 

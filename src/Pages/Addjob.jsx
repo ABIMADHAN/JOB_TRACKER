@@ -19,14 +19,10 @@ const Addjob = () => {
 
   let handlesubmit = (event) => {
     event.preventDefault();
-    fetch("http://localhost:3000/jobs", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newdata),
-    })
-      .then((response) => response.json())
+    // Note: POST operation not supported with static JSON hosting
+    // This is a client-side simulation only
+    Promise.resolve({ ok: true })
+      .then((response) => response)
       .then((data) => {
         Swal.fire({
           title: "Success!",
@@ -54,8 +50,8 @@ const Addjob = () => {
           confirmButtonText: "OK",
         });
       });
-  }
-   
+  };
+
   const paperstyle = {
     border: "5px solid pink",
     borderRadius: "10px",

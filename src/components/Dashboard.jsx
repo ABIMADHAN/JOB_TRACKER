@@ -26,8 +26,9 @@ const Dashboard = () => {
 
   const fetchJobs = async () => {
     try {
-      const response = await fetch("http://localhost:3000/jobs");
-      const data = await response.json();
+      const response = await fetch("/data.json");
+      const result = await response.json();
+      const data = result.jobs || [];
       setJobs(data);
       calculateStats(data);
     } catch (error) {
@@ -171,7 +172,7 @@ const Dashboard = () => {
               <h3 className="stat-number">
                 {stats.total > 0
                   ? Math.round(
-                      ((stats.interview + stats.offer) / stats.total) * 100
+                      ((stats.interview + stats.offer) / stats.total) * 100,
                     )
                   : 0}
                 %
@@ -183,7 +184,6 @@ const Dashboard = () => {
       </Row>
 
       <Row>
-       
         <Col lg={8} className="mb-4">
           <Card className="dashboard-card">
             <Card.Header>
@@ -219,7 +219,7 @@ const Dashboard = () => {
                           {new Date(job.appliedDate).toLocaleDateString()}
                           {job.deadline &&
                             ` • Deadline: ${new Date(
-                              job.deadline
+                              job.deadline,
                             ).toLocaleDateString()}`}
                         </small>
                       </div>
@@ -276,7 +276,6 @@ const Dashboard = () => {
         </Col>
       </Row>
 
-     
       <Row>
         <Col className="mb-4">
           <Card className="dashboard-card">
